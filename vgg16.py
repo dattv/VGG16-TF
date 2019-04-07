@@ -21,10 +21,11 @@ class vgg16:
             vgg16_npy_path = path
             print(path)
 
-        self.data_dir = np.load(vgg16_npy_path, encoding='latin1').item()
+        self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         print("npy file loadded")
+        print(self.data_dict["conv1_1"][0])
 
-    def build(self, rgb):
+    def build_graph(self, rgb):
         """
         Load variable from npy to build the VGG16
         :param rgb:
@@ -49,6 +50,10 @@ class vgg16:
         assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
 
     def avg_pool(self, bottom, name):
-        tf.nn.avg_pool()
+        return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+
+    def max_pool(self, bottom, name):
+        return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME", name=name)
+
 
 
