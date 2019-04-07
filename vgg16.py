@@ -23,6 +23,7 @@ class vgg16:
 
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         print("npy file loaded")
+        print(self.data_dict.keys())
 
     def build_graph(self, rgb):
         """
@@ -48,6 +49,28 @@ class vgg16:
 
         assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
 
+        self.conv1_1 = self.conv_layer(bgr, "conv1_1")
+        self.conv1_2 = self.conv_layer(self.conv1_1, "conv1_2")
+        self.pool1 = self.max_pool(self.conv1_2, "pool1")
+
+        self.conv2_1 = self.conv_layer(self.pool1, "conv2_1")
+        self.conv2_2 = self.conv_layer(self.conv2_1, "conv2_2")
+        self.pool2 = self.max_pool(self.conv2_2, "pool2")
+
+        self.conv3_1 = self.conv_layer(self.pool2, "conv3_1")
+        self.conv3_2 = self.conv_layer(self.conv3_1, "conv3_2")
+        self.conv3_3 = self.conv_layer(self.conv3_2, "conv3_3")
+        self.pool3 = self.max_pool(self.conv3_3, "pool3")
+
+        self.conv4_1 = self.conv_layer(self.pool3, "conv4_1")
+        self.conv4_2 = self.conv_layer(self.conv4_1, "conv4_2")
+        self.conv4_3 = self.conv_layer(self.conv4_2, "conv4_3")
+        self.pool4 = self.max_pool(self.conv4_3, "pool4")
+
+        self.conv5_1 = self.conv_layer(self.pool4, "conv5_1")
+
+
+
     def avg_pool(self, bottom, name):
         return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
 
@@ -68,7 +91,20 @@ class vgg16:
 
     def fc_layer(self, bottom, name):
         with tf.variable_scope(name):
+            shape = bottom.get_shape().as_list()
+            dim = 1
 
+            for d in shape[1:]:
+                dim *= d
+
+            x = tf.reshape(bottom, [-1, dim])
+
+            weights = self.get_fc_weights(name)
+            biases = self.get_bias_(name)
+
+            # fully connected layer
+            fc = tf.nn.bias_add(tf.matmul(x, weights), biases, name=name)
+            return fc
 
     def get_conv_filter(self, name):
         return tf.constant(self.data_dict[name][0], name=name)
