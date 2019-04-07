@@ -1,12 +1,12 @@
 import inspect
 import os
+import time
+
 import numpy as np
 import tensorflow as tf
 
-import time
-import urllib.request
-
 VGG_MEAN = [103.939, 116.779, 123.68]
+
 
 class vgg16:
     def __init__(self, vgg16_npy_path=None):
@@ -85,7 +85,6 @@ class vgg16:
 
         self.data_dict = None
         print("Build model finished: {}s".format(time.time() - start_time))
-
 
     def avg_pool(self, bottom, name):
         return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
