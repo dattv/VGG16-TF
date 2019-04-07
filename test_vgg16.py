@@ -70,4 +70,14 @@ else:
     plt.subplot(1, 2, 2).set_title(top1_title1)
     plt.imshow(img1)
 
+    # save file
+    SAVE_DIR = "./result"
+    if not os.path.isdir(SAVE_DIR):
+        os.mkdir(SAVE_DIR)
+
+    plt.imsave(SAVE_DIR + "/" + top1_title0, img0)
+    plt.imsave(SAVE_DIR + "/" + top1_title1, img1)
+
     plt.show()
+
+
