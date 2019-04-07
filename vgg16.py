@@ -22,8 +22,8 @@ class vgg16:
             print(path)
 
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
-        print("npy file loadded")
-        print(self.data_dict["conv1_1"][0])
+        print("npy file loaded")
+
 
     def build_graph(self, rgb):
         """

@@ -6,5 +6,5 @@ import time
 
 from vgg16 import *
 
-model = vgg16("./WEIGHTS/vgg16.npy")
+model = vgg16("./vgg16.npy")
 
