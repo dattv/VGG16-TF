@@ -24,7 +24,6 @@ class vgg16:
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         print("npy file loaded")
 
-
     def build_graph(self, rgb):
         """
         Load variable from npy to build the VGG16
@@ -55,5 +54,28 @@ class vgg16:
     def max_pool(self, bottom, name):
         return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME", name=name)
 
+    def conv_layer(self, bottom, name):
+        with tf.variable_scope(name):
+            filt = self.get_conv_filter(name)
 
+            conv = tf.nn.conv2d(bottom, filt, [1, 1, 1, 1], padding="SAME", name=name + "_weight")
+
+            conv_bias = self.get_bias_(name)
+            bias = tf.nn.bias_add(conv, conv_bias, name=name + "_bias")
+
+            relu = tf.nn.relu(bias, name=name + "_relu")
+            return relu
+
+    def fc_layer(self, bottom, name):
+        with tf.variable_scope(name):
+
+
+    def get_conv_filter(self, name):
+        return tf.constant(self.data_dict[name][0], name=name)
+
+    def get_bias_(self, name):
+        return tf.constant(self.data_dict[name][1], name=name)
+
+    def get_fc_weights(self, name):
+        return tf.constant(self.data_dict[name][0], name=name)
 
