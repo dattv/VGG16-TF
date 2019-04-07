@@ -68,7 +68,23 @@ class vgg16:
         self.pool4 = self.max_pool(self.conv4_3, "pool4")
 
         self.conv5_1 = self.conv_layer(self.pool4, "conv5_1")
+        self.conv5_2 = self.conv_layer(self.conv5_1, "conv5_2")
+        self.conv5_3 = self.conv_layer(self.conv5_2, "conv5_3")
+        self.pool5 = self.max_pool(self.conv5_3, "pool5")
 
+        self.fc6 = self.fc_layer(self.pool5, "fc6")
+        assert self.fc6.get_shape().as_list()[1:] == [4096]
+        self.relu6 = tf.nn.relu(self.fc6, name="relu6")
+
+        self.fc7 = self.fc_layer(self.relu6, "fc7")
+        self.relu7 = tf.nn.relu(self.fc7, name="relu7")
+
+        self.fc8 = self.fc_layer(self.relu7, "fc8")
+
+        self.prob = tf.nn.softmax(self.fc8, name="prob")
+
+        self.data_dict = None
+        print("Build model finished: {}s".format(time.time() - start_time))
 
 
     def avg_pool(self, bottom, name):
@@ -103,7 +119,7 @@ class vgg16:
             biases = self.get_bias_(name)
 
             # fully connected layer
-            fc = tf.nn.bias_add(tf.matmul(x, weights), biases, name=name)
+            fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
             return fc
 
     def get_conv_filter(self, name):
