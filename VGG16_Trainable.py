@@ -70,3 +70,18 @@ class Vgg16:
     def save_npy(self, sess, npy_path="./vgg16_saved.npy"):
         assert isinstance(sess, tf.Session)
 
+        data_dict = {}
+        for (name, idx), var in list(self.var_dict.items()):
+            var_out = sess.run(var)
+            if name not in data_dict:
+                data_dict[name] = {}
+            data_dict[name][idx] = var_out
+
+        np.save(npy_path, data_dict)
+        print("file saved", npy_path)
+        return npy_path
+
+    def get_var_count(self):
+        count = 0
+        for v in list(self.var_dict.values()):
+            count +=
