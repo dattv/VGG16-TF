@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-import tensorflow.contrib.tensorrt as tfrt
 from functools import reduce
 
 VGG_MEAN = [103.939, 116.779, 123.68]
@@ -59,7 +58,21 @@ class Vgg16:
 
     def fc_layer(self, bottom, in_size, out_size, name):
         with tf.variable_scope(name):
+            weights, biases = self.get_fc_var(in_size, out_size, name)
 
+            x = tf.reshape(bottom, [-1, in_size])
+            fc = tf.nn.bias_add(tf.matmul(bottom, weights), biases)
+
+            return fc
+
+    def get_fc_var(self, in_size, out_size, name):
+        initial_value = tf.truncated_normal([in_size, out_size], mean=0.e0, stddev=1.e-2)
+        weights = self.get_var(initial_value, name, 0, name + "_weights")
+
+        initial_value = tf.truncated_normal([out_size], mean=0.e0, stddev=1.e-2)
+        biases = self.get_var(initial_value, name, 1, name + "+biases")
+
+        return weights, biases
 
     def get_conv_var(self, filter_size, in_channels, out_channels, name):
         initial_value = tf.truncated_normal([filter_size, filter_size, in_channels, out_channels], mean=0.e0,
