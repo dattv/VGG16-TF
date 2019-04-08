@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import tensorflow.contrib.tensorrt as tfrt
 from functools import reduce
 
 VGG_MEAN = [103.939, 116.779, 123.68]
@@ -48,12 +49,27 @@ class Vgg16:
 
     def conv_layer(self, bottom, in_chanels, out_chanels, name):
         with tf.variable_scope(name):
+            filt, conv_biases = self.get_conv_var(3, in_chanels, out_chanels, name)
+
+            conv = tf.nn.conv2d(bottom, filt, strides=[1, 1, 1, 1], padding='SAME')
+            bias = tf.nn.bias_add(conv, conv_biases)
+            relu = tf.nn.relu(bias)
+
+            return relu
+
+    def fc_layer(self, bottom, in_size, out_size, name):
+        with tf.variable_scope(name):
 
 
     def get_conv_var(self, filter_size, in_channels, out_channels, name):
         initial_value = tf.truncated_normal([filter_size, filter_size, in_channels, out_channels], mean=0.e0,
                                             stddev=1.e-2)
+        filters = self.get_var(initial_value, name, 0, name + "_filters")
 
+        initial_value = tf.truncated_normal([out_channels], mean=0.e0, stddev=1.e-2)
+        biases = self.get_var(initial_value, name, 1, name + "_biases")
+
+        return filters, biases
 
     def get_var(self, initial_value, name, idx, var_name):
         if self.data_dict is not None and name in self.data_dict:
