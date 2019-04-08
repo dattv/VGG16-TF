@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from functools import reduce
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 
@@ -84,4 +85,5 @@ class Vgg16:
     def get_var_count(self):
         count = 0
         for v in list(self.var_dict.values()):
-            count +=
+            count += reduce(lambda x, y: x * y, v.get_shape().as_list())
+        return count
